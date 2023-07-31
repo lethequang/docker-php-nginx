@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+
+    # PHP service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile-php
+        container_name: php-app
+        working_dir: /var/www/
+        volumes:
+            - ../swift-seo-be/:/var/www
+        networks:
+            - app-network
+
+    # Nginx service
+    nginx:
+        build:
+            context: .
+            dockerfile: Dockerfile-nginx
+        container_name: php-nginx
+        ports:
+            - 80:80
+        volumes:
+            - ../swift-seo-be:/var/www  # Adjust the relative path to your Laravel project
+            - ./backend.conf:/etc/nginx/conf.d/swift_seo_be.conf
+        depends_on:
+            - app
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
