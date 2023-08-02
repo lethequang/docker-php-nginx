@@ -58,3 +58,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
+
+ADD . /var/www
+RUN chown -R www-data:www-data /var/www

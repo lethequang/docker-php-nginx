@@ -29,6 +29,39 @@ services:
         networks:
             - app-network
 
+  # MySQL database service
+    mysql-db:
+        image: mysql
+        container_name: mysql-db
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        env_file:
+            - ./.env
+        networks:
+            - app-network
+
+    redis-db:
+        image: docker.io/bitnami/redis:7.0
+        container_name: redis-db
+        environment:
+        # ALLOW_EMPTY_PASSWORD is recommended only for development.
+        - ALLOW_EMPTY_PASSWORD=yes
+        - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+        ports:
+        - '6379:6379'
+        volumes:
+        - 'redis_data:/bitnami/redis/data'
+
 networks:
     app-network:
         driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
+
