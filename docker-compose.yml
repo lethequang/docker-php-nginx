@@ -12,6 +12,8 @@ services:
             - ../swift-seo-be/:/var/www
         networks:
             - app-network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
 
     # Nginx service
     nginx:
@@ -20,7 +22,7 @@ services:
             dockerfile: Dockerfile-nginx
         container_name: php-nginx
         ports:
-            - 80:80
+            - 8001:80
         volumes:
             - ../swift-seo-be:/var/www  # Adjust the relative path to your Laravel project
             - ./backend.conf:/etc/nginx/conf.d/swift_seo_be.conf
@@ -28,6 +30,27 @@ services:
             - app
         networks:
             - app-network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    # Nginx service
+    nginx-2:
+        build:
+            context: .
+            dockerfile: Dockerfile-nginx
+        container_name: php-nginx2
+        ports:
+            - 8002:81
+        volumes:
+            - ../swift-seo-be:/var/www  # Adjust the relative path to your Laravel project
+            - ./backend2.conf:/etc/nginx/conf.d/swift_seo_be_2.conf
+        depends_on:
+            - app
+        networks:
+            - app-network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
 
   # MySQL database service
     mysql-db:
@@ -44,6 +67,8 @@ services:
             - ./.env
         networks:
             - app-network
+        volumes:
+            - mysql_data:/var/lib/mysql
 
     redis-db:
         image: docker.io/bitnami/redis:7.0
@@ -53,9 +78,11 @@ services:
         - ALLOW_EMPTY_PASSWORD=yes
         - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
         ports:
-        - '6379:6379'
+        - '6380:6379'
         volumes:
         - 'redis_data:/bitnami/redis/data'
+        networks:
+            - app-network
 
 networks:
     app-network:
@@ -64,4 +91,4 @@ networks:
 volumes:
   redis_data:
     driver: local
-
+  mysql_data:
